@@ -8,19 +8,50 @@
 import UIKit
 import SnapKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate{
+
     
-    let navigationBar = UINavigationBar()
-    let mainView = UIView()
-    let tabBar = UITabBar()
+    
+    
+    
+    private lazy var navigationBar = UINavigationBar()
+    private lazy var mainView = UIView()
+    private lazy var bottomStackView = UIStackView()
+    private lazy var sideBarButton = UIButton()
+    private lazy var premiumButton = UIButton()
+    private lazy var typeOfCalendar = UILabel()
+    private lazy var calendarFunctionView = UIView()
+    private lazy var todayDateLabel = UILabel()
+    private lazy var returnButton = UIButton()
+    private lazy var resizeButton = UIButton()
+    private lazy var fullscreenButton = UIButton()
+    private lazy var weekStackView = UIStackView()
+    
+    private lazy var sunLabel = UILabel()
+    private lazy var monLabel = UILabel()
+    private lazy var tueLabel = UILabel()
+    private lazy var wedLabel = UILabel()
+    private lazy var thuLabel = UILabel()
+    private lazy var friLabel = UILabel()
+    private lazy var satLabel = UILabel()
+    
+    private lazy var calendarButton = UIButton()
+    private lazy var memoButton = UIButton()
+    private lazy var plusButton = UIButton()
+    private lazy var searchButton = UIButton()
+    private lazy var moreButton = UIButton()
+    
+    private lazy var calendarUICollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+    
+    
     
     
     private let titleLabel : UILabel = {
-       let label = UILabel()
-
+        let label = UILabel()
+        
         label.text = "hello"
         label.textColor = .yellow
-
+        
         return label
     }()
     
@@ -28,17 +59,21 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
+        
         setupView()
         setupNavigationBar()
         setupMainView()
-        setuptabBar()
+        setupBottomStackView()
         
     }
+    
+    
+    
     
     func setupView() {
         view.addSubview(navigationBar)
         view.addSubview(mainView)
-        view.addSubview(tabBar)
+        view.addSubview(bottomStackView)
         
         navigationBar.backgroundColor = .black
         navigationBar.snp.makeConstraints { make in
@@ -54,8 +89,7 @@ class ViewController: UIViewController {
             make.leading.trailing.equalToSuperview()
         }
         
-        tabBar.backgroundColor = .black
-        tabBar.snp.makeConstraints { make in
+        bottomStackView.snp.makeConstraints { make in
             make.top.equalTo(mainView.snp.bottom)
             make.leading.trailing.equalToSuperview()
             make.bottom.equalTo(view.safeAreaLayoutGuide)
@@ -64,7 +98,6 @@ class ViewController: UIViewController {
     }
     
     func setupNavigationBar() {
-        let sideBarButton = UIButton()
         sideBarButton.setImage(UIImage(systemName: "align.horizontal.left.fill"), for: .normal)
         sideBarButton.tintColor = .white
         navigationBar.addSubview(sideBarButton)
@@ -74,7 +107,6 @@ class ViewController: UIViewController {
             make.centerY.equalToSuperview()
         }
         
-        let premiumButton = UIButton()
         premiumButton.setImage(UIImage(systemName: "star.circle"), for: .normal)
         premiumButton.tintColor = .white
         navigationBar.addSubview(premiumButton)
@@ -84,7 +116,6 @@ class ViewController: UIViewController {
             make.centerY.equalToSuperview()
         }
         
-        let typeOfCalendar = UILabel()
         typeOfCalendar.text = "캘린더의 종류 func"
         typeOfCalendar.textColor = .white
         typeOfCalendar.font = UIFont.systemFont(ofSize: 15)
@@ -96,13 +127,12 @@ class ViewController: UIViewController {
             make.leading.equalTo(sideBarButton.snp.trailing).offset(15)
             make.trailing.equalTo(premiumButton.snp.leading)
         }
-
+        
         
         
     }
     func setupMainView() {
         
-        let calendarFunctionView = UIView()
         
         mainView.addSubview(calendarFunctionView)
         
@@ -112,7 +142,6 @@ class ViewController: UIViewController {
             make.height.equalTo(50)
         }
         
-        let todayDateLabel = UILabel()
         let date = Date()
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy년 MM월"
@@ -127,9 +156,6 @@ class ViewController: UIViewController {
             make.width.equalTo(100)
         }
         
-        let returnButton = UIButton()
-        let resizeButton = UIButton()
-        let fullscreenButton = UIButton()
         
         returnButton.setImage(UIImage(systemName: "arrow.uturn.backward"), for: .normal)
         returnButton.tintColor = .white
@@ -145,7 +171,7 @@ class ViewController: UIViewController {
         fullscreenButton.tintColor = .white
         fullscreenButton.backgroundColor = .gray
         fullscreenButton.layer.cornerRadius = 10
-
+        
         calendarFunctionView.addSubview(returnButton)
         calendarFunctionView.addSubview(resizeButton)
         calendarFunctionView.addSubview(fullscreenButton)
@@ -166,11 +192,9 @@ class ViewController: UIViewController {
             make.width.height.equalTo(40)
         }
         
-        let weekStackView = UIStackView()
         
         mainView.addSubview(weekStackView)
         weekStackView.axis = .horizontal
-//        weekStackView.alignment = .fill
         weekStackView.distribution = .fillEqually
         weekStackView.backgroundColor = .black
         weekStackView.snp.makeConstraints{make in
@@ -179,50 +203,41 @@ class ViewController: UIViewController {
             make.height.equalTo(30)
         }
         
-//        var dayOfWeekLabelArray = [UILabel()]
-        
-        let sunLabel = UILabel()
         sunLabel.text = "일"
         sunLabel.textColor = .white
         sunLabel.textAlignment = .center
         sunLabel.font = UIFont.systemFont(ofSize: 11)
-//        dayOfWeekLabelArray.append(sunLabel)
-        let monLabel = UILabel()
+        
         monLabel.text = "월"
         monLabel.textColor = .white
         monLabel.textAlignment = .center
         monLabel.font = UIFont.systemFont(ofSize: 11)
-//        dayOfWeekLabelArray.append(monLabel)
-        let tueLabel = UILabel()
+        
         tueLabel.text = "화"
         tueLabel.textColor = .white
         tueLabel.textAlignment = .center
         tueLabel.font = UIFont.systemFont(ofSize: 11)
-//        dayOfWeekLabelArray.append(tueLabel)
-        let wedLabel = UILabel()
+        
         wedLabel.text = "수"
         wedLabel.textColor = .white
         wedLabel.textAlignment = .center
         wedLabel.font = UIFont.systemFont(ofSize: 11)
-//        dayOfWeekLabelArray.append(wedLabel)
-        let thuLabel = UILabel()
+        
         thuLabel.text = "목"
         thuLabel.textColor = .white
         thuLabel.textAlignment = .center
         thuLabel.font = UIFont.systemFont(ofSize: 11)
-//        dayOfWeekLabelArray.append(thuLabel)
-        let friLabel = UILabel()
+        
         friLabel.text = "금"
         friLabel.textColor = .white
         friLabel.textAlignment = .center
         friLabel.font = UIFont.systemFont(ofSize: 11)
-//        dayOfWeekLabelArray.append(friLabel)
-        let satLabel = UILabel()
+        
         satLabel.text = "토"
         satLabel.textColor = .white
         satLabel.textAlignment = .center
         satLabel.font = UIFont.systemFont(ofSize: 11)
-//        dayOfWeekLabelArray.append(satLabel)
+        
         weekStackView.addArrangedSubview(sunLabel)
         weekStackView.addArrangedSubview(monLabel)
         weekStackView.addArrangedSubview(tueLabel)
@@ -231,74 +246,67 @@ class ViewController: UIViewController {
         weekStackView.addArrangedSubview(friLabel)
         weekStackView.addArrangedSubview(satLabel)
         
-//        let layout = UICollectionViewFlowLayout()
-//        layout.scrollDirection = .horizontal
-//        let calendarCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-//        mainView.addSubview(calendarFunctionView)
-//        calendarFunctionView.backgroundColor = .systemGray
-//
-//        calendarFunctionView.snp.makeConstraints{make in
-//            make.top.equalTo(weekStackView.snp.bottom)
-//            make.leading.trailing.bottom.equalToSuperview()
-//        }
-//
-    }
-    func setuptabBar() {
         
-        tabBar.itemSpacing = UIScreen.main.bounds.width/5
-        tabBar.itemPositioning = .centered
-        let calendarButton = UIButton()
-        let memoButton = UIButton()
-        let plusButton = UIButton()
-        let searchButton = UIButton()
-        let moreButton = UIButton()
-        
-        
-        calendarButton.setImage(UIImage(systemName: "calendar"), for: .normal)
-        calendarButton.tintColor = .white
-        tabBar.addSubview(calendarButton)
-        calendarButton.snp.makeConstraints{make in
-//            make.leading.equalToSuperview().offset(10)
-            make.width.height.equalTo(40)
-            make.centerY.equalToSuperview()
-        }
-
-        memoButton.setImage(UIImage(systemName: "note.text"), for: .normal)
-        memoButton.tintColor = .white
-        tabBar.addSubview(memoButton)
-        memoButton.snp.makeConstraints{make in
-//            make.leading.equalTo(calendarButton.snp.trailing)
-            make.width.height.equalTo(40)
-            make.centerY.equalToSuperview()
-        }
-        
-        plusButton.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
-        plusButton.tintColor = .white
-        tabBar.addSubview(plusButton)
-        plusButton.snp.makeConstraints{make in
-//            make.centerX.centerY.equalToSuperview()
-            make.width.height.equalTo(40)
-        }
-        
-        searchButton.setImage(UIImage(systemName: "magnifyingglass"), for: .normal)
-        searchButton.tintColor = .white
-        tabBar.addSubview(searchButton)
-        searchButton.snp.makeConstraints{make in
-//            make.leading.equalTo(plusButton.snp.trailing).offset(-10)
-            make.width.height.equalTo(40)
-            make.centerY.equalToSuperview()
-        }
-        
-        moreButton.setImage(UIImage(systemName: "ellipsis"), for: .normal)
-        moreButton.tintColor = .white
-        tabBar.addSubview(moreButton)
-        moreButton.snp.makeConstraints{make in
-//            make.trailing.equalToSuperview().offset(-10)
-//            make.leading.equalTo(searchButton.snp.trailing)
-            make.width.height.equalTo(40)
-            make.centerY.equalToSuperview()
+        mainView.addSubview(calendarUICollectionView)
+        calendarUICollectionView.dataSource = self
+        calendarUICollectionView.delegate = self
+        calendarUICollectionView.register(CalendarCollectionViewCell.self, forCellWithReuseIdentifier: CalendarCollectionViewCell.identifier)
+        calendarUICollectionView.backgroundColor = .gray
+        calendarUICollectionView.snp.makeConstraints{make in
+            make.leading.trailing.bottom.equalToSuperview()
+            make.top.equalTo(weekStackView.snp.bottom)
         }
         
     }
     
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 42
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CalendarCollectionViewCell.identifier, for: indexPath) as? CalendarCollectionViewCell else { return UICollectionViewCell() }
+        return cell
+    }
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = self.weekStackView.frame.width / 7
+        return CGSize(width: width, height: width * 1.3)
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return .zero
+    }
+    
+    func setupBottomStackView() {
+        
+        
+        bottomStackView.axis = .horizontal
+        bottomStackView.distribution = .fillEqually
+        bottomStackView.backgroundColor = .black
+        
+        bottomStackView.addArrangedSubview(calendarButton)
+        bottomStackView.addArrangedSubview(memoButton)
+        bottomStackView.addArrangedSubview(plusButton)
+        bottomStackView.addArrangedSubview(searchButton)
+        bottomStackView.addArrangedSubview(moreButton)
+        
+        calendarButton.setImage(UIImage(systemName: "calendar"), for: .normal)
+        calendarButton.tintColor = .white
+        
+        memoButton.setImage(UIImage(systemName: "note.text"), for: .normal)
+        memoButton.tintColor = .white
+        
+        plusButton.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
+        plusButton.tintColor = .white
+        
+        searchButton.setImage(UIImage(systemName: "magnifyingglass"), for: .normal)
+        searchButton.tintColor = .white
+        
+        moreButton.setImage(UIImage(systemName: "ellipsis"), for: .normal)
+        moreButton.tintColor = .white
+        
+    }
+    
+    
 }
+
+
