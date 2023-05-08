@@ -8,10 +8,15 @@
 import UIKit
 import SnapKit
 
-class ViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate{
+class ViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout{
 
     
     
+    private var days = [String]()
+    private var year = Int()
+    private var month = Int()
+    private var startOfTheWeek = Int()
+    private var endOfTheMonth = Int()
     
     
     private lazy var navigationBar = UINavigationBar()
@@ -44,18 +49,6 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     private lazy var calendarUICollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     
     
-    
-    
-    private let titleLabel : UILabel = {
-        let label = UILabel()
-        
-        label.text = "hello"
-        label.textColor = .yellow
-        
-        return label
-    }()
-    
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
@@ -64,10 +57,8 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         setupNavigationBar()
         setupMainView()
         setupBottomStackView()
-        
+    
     }
-    
-    
     
     
     func setupView() {
@@ -116,7 +107,7 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
             make.centerY.equalToSuperview()
         }
         
-        typeOfCalendar.text = "캘린더의 종류 func"
+        typeOfCalendar.text = "캘린더 종류"
         typeOfCalendar.textColor = .white
         typeOfCalendar.font = UIFont.systemFont(ofSize: 15)
         typeOfCalendar.font = UIFont.boldSystemFont(ofSize: UIFont.labelFontSize)
@@ -141,9 +132,14 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
             make.top.trailing.leading.equalToSuperview()
             make.height.equalTo(50)
         }
-        
+        calendarFunctionView.layer.cornerRadius = 10
+        mainView.backgroundColor = .black
         let date = Date()
         let dateFormatter = DateFormatter()
+        
+        year = Calendar.current.component(.year, from: date)
+        month = Calendar.current.component(.month, from: date)
+        
         dateFormatter.dateFormat = "yyyy년 MM월"
         todayDateLabel.text = dateFormatter.string(from: date)
         todayDateLabel.textColor = .white
@@ -256,23 +252,48 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
             make.leading.trailing.bottom.equalToSuperview()
             make.top.equalTo(weekStackView.snp.bottom)
         }
+        calendarUICollectionView.layer.cornerRadius = 10
         
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 42
+        var numOfDaysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31]
+        if (year % 4 == 0 && year % 100 != 0) || year % 400 == 0{
+            numOfDaysInMonth[1] = 29
+        }
+        startOfTheWeek = (21 * (year/100)/4 + 5*(year%100)/4 + 26*(month + 1)/10)%7
+        endOfTheMonth = numOfDaysInMonth[month - 1]
+        for _ in Int()..<startOfTheWeek{
+            days.append("")
+        }
+        for day in 1..<endOfTheMonth+1{
+            days.append("\(day)")
+        }
+        for _ in 1..<(startOfTheWeek + endOfTheMonth)%7{
+            days.append("")
+        }
+        
+        return days.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CalendarCollectionViewCell.identifier, for: indexPath) as? CalendarCollectionViewCell else { return UICollectionViewCell() }
+        cell.update(day : days[indexPath.item])
+        
+//        cell.layer.borderWidth = 1
         return cell
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = self.weekStackView.frame.width / 7
-        return CGSize(width: width, height: width * 1.3)
+        let width = self.calendarUICollectionView.frame.width / 7
+        let height = self.calendarUICollectionView.frame.height / Double((days.count + 6)/7)
+        
+        return CGSize(width: width, height: height)
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return .zero
+    }
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return .zero
     }
     
