@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SnapKit
 
 class CalendarCollectionViewCell: UICollectionViewCell {
     static let identifier = "CalendarCollectionViewCell"
@@ -20,17 +21,20 @@ class CalendarCollectionViewCell: UICollectionViewCell {
         super.init(frame: frame)
         self.configure()
     }
+    
+    func update(day: String){
+        self.dayLabel.text = day
+    }
 
     private func configure() {
         self.addSubview(self.dayLabel)
-        self.dayLabel.text = "0"
+//        self.dayLabel.text = "0"
         self.dayLabel.textAlignment = .center
         self.dayLabel.font = .boldSystemFont(ofSize: 12)
-        self.dayLabel.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            self.dayLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: 5),
-            self.dayLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor)
-        ])
+        dayLabel.snp.makeConstraints{make in
+            make.top.equalToSuperview().offset(5)
+            make.centerX.equalToSuperview()
+        }
     }
     
 }
